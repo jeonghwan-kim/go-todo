@@ -11,17 +11,17 @@
 	 * real life you probably would be making AJAX calls
 	 */
 	function Store(name, callback) {
-		callback = callback || function () {};
+		// callback = callback || function () {};
 
-		this._dbName = name;
+		// this._dbName = name;
 
-		if (!localStorage.getItem(name)) {
-			var todos = [];
+		// if (!localStorage.getItem(name)) {
+		// 	var todos = [];
 
-			localStorage.setItem(name, JSON.stringify(todos));
-		}
+		// 	localStorage.setItem(name, JSON.stringify(todos));
+		// }
 
-		callback.call(this, JSON.parse(localStorage.getItem(name)));
+    // callback.call(this, JSON.parse(localStorage.getItem(name)));
 	}
 
 	/**
@@ -61,7 +61,14 @@
 	 */
 	Store.prototype.findAll = function (callback) {
 		callback = callback || function () {};
-		callback.call(this, JSON.parse(localStorage.getItem(this._dbName)));
+    // callback.call(this, JSON.parse(localStorage.getItem(this._dbName)));
+    $http('/api/todos', 'get', null, function (err, res) {
+      if (err) {
+        throw err;
+      }
+
+      callback.call(this, res.data)
+    })
 	};
 
 	/**
@@ -73,7 +80,7 @@
 	 * @param {number} id An optional param to enter an ID of an item to update
 	 */
 	Store.prototype.save = function (updateData, callback, id) {
-		var todos = JSON.parse(localStorage.getItem(this._dbName));
+		// var todos = JSON.parse(localStorage.getItem(this._dbName));
 
 		callback = callback || function() {};
 
@@ -92,11 +99,19 @@
 			callback.call(this, todos);
 		} else {
 			// Generate an ID
-			updateData.id = new Date().getTime();
+      updateData.id = new Date().getTime();
 
-			todos.push(updateData);
-			localStorage.setItem(this._dbName, JSON.stringify(todos));
-			callback.call(this, [updateData]);
+      // todos.push(updateData);
+			// localStorage.setItem(this._dbName, JSON.stringify(todos));
+      // callback.call(this, [updateData]);
+
+      $http('/api/addTodo', 'post', updateData, function (err, res) {
+        if (err) {
+          throw err
+        }
+
+        callback.call(this, [res.data])
+      })
 		}
 	};
 
@@ -117,7 +132,7 @@
 		}
 
 		localStorage.setItem(this._dbName, JSON.stringify(todos));
-		callback.call(this, todos);
+    callback.call(this, todos);
 	};
 
 	/**

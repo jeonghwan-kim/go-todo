@@ -48,5 +48,35 @@
 
 	// Allow for looping on nodes by chaining:
 	// qsa('.foo').forEach(function () {})
-	NodeList.prototype.forEach = Array.prototype.forEach;
+  NodeList.prototype.forEach = Array.prototype.forEach;
+
+  window.$http = function (path, method, data, callback) {
+    if (!path) {
+      throw Error('path is required');
+    }
+    if (typeof callback !== 'function') {
+      throw Error('callback should be function');
+    }
+
+    method = method || 'get';
+    data = data || null
+
+    var req = new XMLHttpRequest();
+    req.open(method, path, true);
+    req.onreadystatechange = () => {
+      if (req.readyState === 4) {
+        if (req.status === 200) {
+          try {
+            req.data = JSON.parse(req.responseText);
+            callback(null, req);
+          } catch (err) {
+            callback(Error('$http response parse error'));
+          }
+        } else {
+          callback(Error('$http request error'));
+        }
+      }
+    }
+    req.send(JSON.stringify(data))
+  }
 })(window);
