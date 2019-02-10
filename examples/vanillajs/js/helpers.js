@@ -70,6 +70,7 @@
             req.data = JSON.parse(req.responseText);
             callback(null, req);
           } catch (err) {
+            console.log(err)
             callback(Error('$http response parse error'));
           }
         } else {

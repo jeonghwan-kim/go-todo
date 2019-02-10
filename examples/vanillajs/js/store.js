@@ -42,16 +42,24 @@
 			return;
 		}
 
-		var todos = JSON.parse(localStorage.getItem(this._dbName));
+		// var todos = JSON.parse(localStorage.getItem(this._dbName));
 
-		callback.call(this, todos.filter(function (todo) {
-			for (var q in query) {
-				if (query[q] !== todo[q]) {
-					return false;
-				}
-			}
-			return true;
-		}));
+    $http('/api/todos', 'get', null, function (err, res) {
+      if (err) {
+        throw err;
+      }
+
+      callback.call(this, res.data.filter(function (todo) {
+        for (var q in query) {
+          if (query[q] !== todo[q]) {
+            return false;
+          }
+        }
+        return true;
+      }));
+    })
+
+
 	};
 
 	/**
@@ -86,17 +94,25 @@
 
 		// If an ID was actually given, find the item and update each property
 		if (id) {
-			for (var i = 0; i < todos.length; i++) {
-				if (todos[i].id === id) {
-					for (var key in updateData) {
-						todos[i][key] = updateData[key];
-					}
-					break;
-				}
-			}
+			// for (var i = 0; i < todos.length; i++) {
+			// 	if (todos[i].id === id) {
+			// 		for (var key in updateData) {
+			// 			todos[i][key] = updateData[key];
+			// 		}
+			// 		break;
+			// 	}
+			// }
 
-			localStorage.setItem(this._dbName, JSON.stringify(todos));
-			callback.call(this, todos);
+			// localStorage.setItem(this._dbName, JSON.stringify(todos));
+      // callback.call(this, todos);
+
+      $http('/api/todos', 'put', {...updateData, id}, function (err, res) {
+        if (err) {
+          throw err
+        }
+
+        callback.call(this, [res.data])
+      })
 		} else {
 			// Generate an ID
       updateData.id = new Date().getTime();
@@ -105,7 +121,7 @@
 			// localStorage.setItem(this._dbName, JSON.stringify(todos));
       // callback.call(this, [updateData]);
 
-      $http('/api/addTodo', 'post', updateData, function (err, res) {
+      $http('/api/todos', 'post', updateData, function (err, res) {
         if (err) {
           throw err
         }
@@ -122,17 +138,25 @@
 	 * @param {function} callback The callback to fire after saving
 	 */
 	Store.prototype.remove = function (id, callback) {
-		var todos = JSON.parse(localStorage.getItem(this._dbName));
+		// var todos = JSON.parse(localStorage.getItem(this._dbName));
 
-		for (var i = 0; i < todos.length; i++) {
-			if (todos[i].id == id) {
-				todos.splice(i, 1);
-				break;
-			}
-		}
+		// for (var i = 0; i < todos.length; i++) {
+		// 	if (todos[i].id == id) {
+		// 		todos.splice(i, 1);
+		// 		break;
+		// 	}
+		// }
 
-		localStorage.setItem(this._dbName, JSON.stringify(todos));
-    callback.call(this, todos);
+		// localStorage.setItem(this._dbName, JSON.stringify(todos));
+    // callback.call(this, todos);
+
+    $http('/api/todos/?id=' + id, 'delete', null, function (err, res) {
+      if (err) {
+        throw err
+      }
+
+      callback.call(this, [res.data])
+    })
 	};
 
 	/**

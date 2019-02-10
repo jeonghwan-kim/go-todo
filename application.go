@@ -37,6 +37,14 @@ func (a *Application) Post(path string, handler func(rw http.ResponseWriter, r *
 	a.AddFunc(http.MethodPost, path, handler)
 }
 
+func (a *Application) Delete(path string, handler func(rw http.ResponseWriter, r *http.Request)) {
+	a.AddFunc(http.MethodDelete, path, handler)
+}
+
+func (a *Application) Put(path string, handler func(rw http.ResponseWriter, r *http.Request)) {
+	a.AddFunc(http.MethodPut, path, handler)
+}
+
 func (a *Application) Static(root string) {
 	fs := http.FileServer(http.Dir(root))
 	a.Add(http.MethodGet, "/*", fs)
@@ -64,6 +72,10 @@ func NewApplication() *Application {
 
 func Bind(r *http.Request, i interface{}) {
 	json.NewDecoder(r.Body).Decode(i)
+}
+
+func QueryParam(r *http.Request, key string) string {
+	return r.URL.Query().Get(key)
 }
 
 func Json(rw http.ResponseWriter, i interface{}) {
