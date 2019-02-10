@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -59,4 +60,13 @@ func (a *Application) Start(port string) {
 
 func NewApplication() *Application {
 	return &Application{}
+}
+
+func Bind(r *http.Request, i interface{}) {
+	json.NewDecoder(r.Body).Decode(i)
+}
+
+func Json(rw http.ResponseWriter, i interface{}) {
+	enc := json.NewEncoder(rw)
+	enc.Encode(&i)
 }

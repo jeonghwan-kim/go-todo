@@ -1,14 +1,14 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
 type Todo struct {
-	Id       int    `json:"id"`
-	Title    string `json:"title"`
-	Complted bool   `json:"completed"`
+	Id        int    `json:"id"`
+	Title     string `json:"title"`
+	Completed bool   `json:"completed"`
 }
 
 func main() {
@@ -17,24 +17,17 @@ func main() {
 	a := NewApplication()
 
 	a.Get("/api/todos", func(rw http.ResponseWriter, r *http.Request) {
-		enc := json.NewEncoder(rw)
-		enc.Encode(&db)
-
-		// res.Json(&db)
+		Json(rw, &db)
 	})
 
 	a.Post("/api/addTodo", func(rw http.ResponseWriter, r *http.Request) {
 		var t Todo
-
-		// req.Bind(&t)
-
-		json.NewDecoder(r.Body).Decode(&t)
+		// json.NewDecoder(r.Body).Decode(&t)
+		Bind(r, &t)
+		fmt.Printf("%+v\n", t)
 		db = append(db, t)
-
-		enc := json.NewEncoder(rw)
-		enc.Encode(&db)
-
-		// res.Json(&db)
+		fmt.Printf("%+v\n", db)
+		Json(rw, &db)
 	})
 
 	a.Static("examples/vanillajs")
